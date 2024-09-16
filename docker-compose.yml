@@ -1,38 +1,53 @@
+version: '3.8'
+
 services:
     php:
         build:
-            context: docker/php
-            dockerfile: Dockerfile
-        ports:
-            - "80:80"
-        restart: unless-stopped
+            context: ./docker/php
         working_dir: /var/www
         volumes:
             - ./:/var/www
-            - vendor:/var/www/vendor
-            - node_modules:/var/www/node_modules
         entrypoint: ["sh", "./docker/php/entrypoint.sh"]
+        depends_on:
+            - db
+        restart: unless-stopped
 
     nginx:
         image: nginx:1.17-alpine
-        container_name: varord-nginx
-        #        restart: unless-stopped
         ports:
-            - 80:80
+            - "80:80"
         volumes:
             - ./:/var/www
-            - ./docker-compose/nginx:/etc/nginx/conf.d
+            - ./docker/nginx:/etc/nginx/conf.d
+        depends_on:
+            - php
+        restart: unless-stopped
 
     db:
-        build:
-            context: ../backend/docker/postgres
-            dockerfile: Dockerfile
-        restart: unless-stopped
-        ports:
-            - "5432:5432"
+        image: mysql:8.0
         environment:
-            POSTGRES_DB: app_db
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: mydatabase
+            MYSQL_USER: user
+            MYSQL_PASSWORD: userpassword
+        ports:
+            - "3306:3306"
         volumes:
-            - db_data:/var/lib/postgresql/data
+            - mysql-data:/var/lib/mysql
+        restart: unless-stopped
+
+    schedule:
+        build:
+            context: ./docker/php-cli
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www
+        depends_on:
+            - db
+            - php
+            - nginx
+        command: sh -c '/var/www/docker/php/wait-for-it.sh php:9000 --timeout=60 --strict -- echo "PHP is up" && php artisan schedule:work'
+        restart: unless-stopped
+
+volumes:
+    mysql-data:
