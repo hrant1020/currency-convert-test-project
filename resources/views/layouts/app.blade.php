@@ -15,7 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark bg-gray mb-5">
+        <nav class="navbar navbar-expand navbar-dark bg-dark bg-gray mb-5">
             <div class="container">
                 @guest()
                     <a class="navbar-brand" href="{{ route('index') }}">{{ config('app.name', 'Converter') }}</a>

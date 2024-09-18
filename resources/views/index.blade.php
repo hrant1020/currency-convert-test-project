@@ -9,7 +9,7 @@
                     @csrf
 
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-lg-6">
                             <div class="input-group mb-3">
                                 <input type="number" class="form-control @error('amount') is-invalid @enderror" name="amount" value="{{ old('amount') ?? 1 }}" step="any">
                                 <span class="input-group-text" >
