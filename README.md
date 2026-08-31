@@ -22,11 +22,3 @@ Any suitable framework can be used to implement the currency converter module.
 
 ```
 
-#### Login credentials 
-```
-email : test@gmail.com
-password:   secret
-```
-
-## Deployed on server
-### http://64.226.110.128/
